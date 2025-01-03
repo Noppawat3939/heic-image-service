@@ -8,8 +8,7 @@ const PORT = 4000;
 
 const app = express();
 
-app.use(
-  cors(),
+app.use(cors()).use(
   rateLimit({
     windowMs: 1 * 1000,
     max: 100,
@@ -27,29 +26,29 @@ app.get("/check", async (_, res) => {
 app.get("/convert/heic", async (req, res) => {
   const { url = "", format = "png" } = req.query;
 
-  if (!url || url?.search(".heic") == -1)
+  if (
+    !url ||
+    url?.search(".heic") === -1 ||
+    (format && !["png", "jpeg"].includes(format.toLowerCase()))
+  )
     return res.send("failed convert heic image");
 
   try {
-    const { data } = await axios({ url, responseType: "arraybuffer" });
+    const { data: buffer } = await axios({ url, responseType: "arraybuffer" });
 
-    const buffer = await heicConvert({
-      buffer: data,
+    const arrBuffer = await heicConvert({
+      buffer,
       format: format.toUpperCase(),
     });
 
     res.setHeader("Content-Type", `image/${format}`);
-    res.send(buffer);
+    res.send(arrBuffer);
   } catch (err) {
-    console.log("❌ failed fetch", err);
+    console.debug(err);
     return res.send("failed convert heic image");
   }
 });
 
-try {
-  app.listen(PORT, () => {
-    console.log(`✅ Server is running on port ${PORT}`);
-  });
-} catch (err) {
-  console.log(err);
-}
+app.listen(PORT, () => {
+  console.log(`✅ Server is running on port ${PORT}`);
+});
