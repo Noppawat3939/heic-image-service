@@ -15,13 +15,9 @@ app.use(cors()).use(
   })
 );
 
-app.get("/check", async (_, res) => {
-  return res.status(200).json({
-    success: true,
-    message: "server is running smoothly",
-    timestampt: new Date().toISOString().split("T").join(" "),
-  });
-});
+app.get("/", async (_, res) =>
+  res.redirect("https://github.com/Noppawat3939/heic-image-service")
+);
 
 app.get("/convert/heic", async (req, res) => {
   const { url = "", format = "png" } = req.query;
@@ -49,6 +45,14 @@ app.get("/convert/heic", async (req, res) => {
   }
 });
 
+app.get("/check", async (_, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "server is running smoothly",
+    timestampt: new Date().toISOString().split("T").join(" "),
+  });
+});
+
 app.listen(PORT, () => {
-  console.log(`✅ Server is running on port ${PORT}`);
+  console.log(`server is running on port ${PORT}`);
 });
